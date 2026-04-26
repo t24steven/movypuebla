@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import '../config.dart';
 import '../models/route_model.dart';
 import '../models/stop_model.dart';
+import '../services/osrm_service.dart';
 
 class RouteDetailScreen extends StatefulWidget {
   static const routeName = '/route-detail';
@@ -22,8 +23,11 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
   bool _loading = true;
   bool _initialized = false;
   final MapController _mapController = MapController();
-
   final String _baseUrl = getBaseUrl();
+
+  // Ruta real por calles (OSRM)
+  List<LatLng> _realRoutePoints = [];
+  RouteInfo? _routeInfo;
 
   List<StopModel> get _geoStops =>
       _stops.where((s) => s.lat != null && s.lng != null).toList();
@@ -62,12 +66,17 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
         );
       }).toList();
 
-  List<LatLng> get _polylinePoints =>
-      _geoStops.map((s) => LatLng(s.lat!, s.lng!)).toList();
+  /// Puntos para la polyline: usa ruta OSRM si está disponible,
+  /// si no, líneas rectas entre paradas como fallback.
+  List<LatLng> get _polylinePoints {
+    if (_realRoutePoints.isNotEmpty) return _realRoutePoints;
+    return _geoStops.map((s) => LatLng(s.lat!, s.lng!)).toList();
+  }
 
   void _fitMapToStops() {
-    if (_geoStops.length < 2) return;
-    final bounds = LatLngBounds.fromPoints(_polylinePoints);
+    final points = _polylinePoints;
+    if (points.length < 2) return;
+    final bounds = LatLngBounds.fromPoints(points);
     _mapController.fitCamera(
       CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(40)),
     );
@@ -95,6 +104,10 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
             .map((e) => StopModel.fromJson(e as Map<String, dynamic>))
             .toList();
         setState(() {});
+
+        // Obtener ruta real por calles con OSRM
+        await _loadOsrmRoute();
+
         WidgetsBinding.instance.addPostFrameCallback((_) => _fitMapToStops());
       } else {
         if (!mounted) return;
@@ -109,6 +122,32 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
       );
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _loadOsrmRoute() async {
+    if (_geoStops.length < 2) return;
+    try {
+      final waypoints = _geoStops.map((s) => LatLng(s.lat!, s.lng!)).toList();
+
+      // Obtener ruta con info de distancia/duración
+      final info = await OsrmService.getRouteInfo(
+        waypoints.first,
+        waypoints.last,
+      );
+
+      // Obtener ruta completa pasando por todas las paradas
+      final points = await OsrmService.getRoute(waypoints);
+
+      if (mounted && points.isNotEmpty) {
+        setState(() {
+          _realRoutePoints = points;
+          _routeInfo = info;
+        });
+      }
+    } catch (e) {
+      // Si OSRM falla, se usa el fallback de líneas rectas
+      debugPrint('OSRM no disponible: $e');
     }
   }
 
@@ -167,6 +206,51 @@ class _RouteDetailScreenState extends State<RouteDetailScreen> {
                       ],
                     ),
                   ),
+
+                // Info de distancia y tiempo (OSRM)
+                if (_routeInfo != null)
+                  Container(
+                    width: double.infinity,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    color: Colors.green.shade50,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.straighten,
+                                size: 18, color: Colors.green),
+                            const SizedBox(width: 4),
+                            Text(_routeInfo!.distanceText,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const Icon(Icons.schedule,
+                                size: 18, color: Colors.green),
+                            const SizedBox(width: 4),
+                            Text(_routeInfo!.durationText,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const Icon(Icons.pin_drop,
+                                size: 18, color: Colors.green),
+                            const SizedBox(width: 4),
+                            Text('${_geoStops.length} paradas',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.all(16),
