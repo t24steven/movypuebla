@@ -25,6 +25,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  # Descomenta cuando tengas el archivo assets/logo.png:
-  # assets:
-  #   - assets/logo.png
+  assets:
+    - assets/movypuebla.png

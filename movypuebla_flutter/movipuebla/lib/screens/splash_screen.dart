@@ -14,7 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 3), () {
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
     });
@@ -29,8 +29,13 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.directions_bus, size: 80, color: Colors.white),
-            const SizedBox(height: 16),
+            // Logo
+            Image.asset(
+              'assets/movypuebla.png',
+              width: 280,
+              height: 280,
+            ),
+            const SizedBox(height: 24),
             Text(
               t.t('appName'),
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(

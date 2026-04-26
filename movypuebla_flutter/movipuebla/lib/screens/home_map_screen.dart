@@ -115,16 +115,97 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
     super.dispose();
   }
 
+  void _showDriverInfoSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const CircleAvatar(
+              radius: 36,
+              backgroundColor: Colors.green,
+              child: Icon(Icons.directions_bus, size: 40, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            const Text('Conductor en turno',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            _driverInfoRow(Icons.person, 'Nombre', 'Juan Pérez López'),
+            _driverInfoRow(Icons.badge, 'No. Operador', 'OP-2024-0153'),
+            _driverInfoRow(
+                Icons.route, 'Ruta asignada', 'L3 Valsequillo – CAPU'),
+            _driverInfoRow(Icons.directions_bus, 'Unidad', 'Unidad #42'),
+            _driverInfoRow(Icons.circle, 'Estado', 'En servicio',
+                valueColor: Colors.green),
+            const SizedBox(height: 16),
+            Text(
+              'Esta información se actualiza cuando el conductor inicia su turno.',
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _driverInfoRow(IconData icon, String label, String value,
+      {Color? valueColor}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: Colors.green.shade700),
+          const SizedBox(width: 12),
+          Text('$label: ', style: TextStyle(color: Colors.grey.shade600)),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: valueColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         title: Text('MovyPuebla - ${LanguageScope.of(context).t('urban')}'),
-        actions: const [LanguageSelector()],
+        actions: [
+          const LanguageSelector(),
+          IconButton(
+            icon: const Icon(Icons.person_pin),
+            tooltip: 'Info del conductor',
+            onPressed: () => _showDriverInfoSheet(context),
+          ),
+        ],
       ),
       floatingActionButton: const PanicButton(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: Column(
         children: [
           SizedBox(
