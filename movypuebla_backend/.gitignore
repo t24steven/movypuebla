@@ -1,0 +1,11 @@
+# Dependencias
+node_modules/
+
+# Build
+dist/
+
+# Credenciales Firebase (NUNCA subir)
+serviceAccountKey.json
+
+# Variables de entorno
+.env
