@@ -12,6 +12,12 @@ class RouteModel {
   final double? nightFare;
   final bool supportsNightService;
 
+  // Campos de búsqueda inteligente (opcionales, solo cuando se busca con coordenadas)
+  final String? nearestOriginStop;
+  final double? nearestOriginDistKm;
+  final String? nearestDestStop;
+  final double? nearestDestDistKm;
+
   RouteModel({
     required this.id,
     required this.name,
@@ -25,6 +31,10 @@ class RouteModel {
     required this.discountSeniorMax,
     this.nightFare,
     required this.supportsNightService,
+    this.nearestOriginStop,
+    this.nearestOriginDistKm,
+    this.nearestDestStop,
+    this.nearestDestDistKm,
   });
 
   factory RouteModel.fromJson(Map<String, dynamic> json) {
@@ -43,6 +53,14 @@ class RouteModel {
           ? (json['nightFare'] as num).toDouble()
           : null,
       supportsNightService: json['supportsNightService'] as bool? ?? false,
+      nearestOriginStop: json['nearestOriginStop'] as String?,
+      nearestOriginDistKm: json['nearestOriginDistKm'] != null
+          ? (json['nearestOriginDistKm'] as num).toDouble()
+          : null,
+      nearestDestStop: json['nearestDestStop'] as String?,
+      nearestDestDistKm: json['nearestDestDistKm'] != null
+          ? (json['nearestDestDistKm'] as num).toDouble()
+          : null,
     );
   }
 }

@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import routesRouter from './routes/routesRouter';
+import usersRouter from './routes/usersRouter';
 
 const app = express();
 app.use(cors());
@@ -11,6 +12,7 @@ app.get('/', (_req: Request, res: Response) => {
 });
 
 app.use('/routes', routesRouter);
+app.use('/users', usersRouter);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

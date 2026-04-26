@@ -4,6 +4,7 @@ import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_map_screen.dart';
 import 'screens/route_detail_screen.dart';
+import 'screens/driver_dashboard_screen.dart';
 
 class MovyPueblaApp extends StatelessWidget {
   const MovyPueblaApp({super.key});
@@ -24,6 +25,7 @@ class MovyPueblaApp extends StatelessWidget {
         RegisterScreen.routeName: (_) => const RegisterScreen(),
         HomeMapScreen.routeName: (_) => const HomeMapScreen(),
         RouteDetailScreen.routeName: (_) => const RouteDetailScreen(),
+        DriverDashboardScreen.routeName: (_) => const DriverDashboardScreen(),
       },
     );
   }

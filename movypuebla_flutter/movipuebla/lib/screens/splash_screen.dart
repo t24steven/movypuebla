@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/language_provider.dart';
 import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -21,26 +22,26 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = LanguageScope.of(context);
     return Scaffold(
       backgroundColor: Colors.green.shade700,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // TODO: Reemplaza con Image.asset('assets/logo.png') cuando tengas el logo
-            Icon(Icons.directions_bus, size: 80, color: Colors.white),
+            const Icon(Icons.directions_bus, size: 80, color: Colors.white),
             const SizedBox(height: 16),
             Text(
-              'MovyPuebla',
+              t.t('appName'),
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Por amor a Puebla',
-              style: TextStyle(color: Colors.white70, fontSize: 16),
+            Text(
+              t.t('slogan'),
+              style: const TextStyle(color: Colors.white70, fontSize: 16),
             ),
           ],
         ),
